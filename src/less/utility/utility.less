@@ -1,0 +1,72 @@
+@modifyer: ~"";
+.u-modifyer(@mod) when not (@mod = ~''){
+	@modifyer: ~"--@{mod}";
+}
+
+// Push
+.u-push(@a, @b) when not (@a > @b) {
+	@push: (100/@b)*@a;
+	position: relative;
+	left: ~"@{push}%";
+}
+
+// Pull
+.u-pull(@a, @b) when not (@a > @b) {
+	@pull: (100/@b)*@a;
+	position: relative;
+	left: ~"-@{pull}%";
+}
+
+// Hide visually and from screen readers:
+.u-hidden {
+  display: none !important;
+}
+
+// Hide only visually, but have it available for screen readers:
+.u-visuallyHidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+
+	// Extends the .visuallyhidden class to allow the element
+	// to be focusable when navigated to via the keyboard:
+  &.focusable {
+  	&:active, &:focus {
+  		clip: auto;
+			height: auto;
+			margin: 0;
+			overflow: visible;
+			position: static;
+			width: auto;
+  	}
+  }
+}
+
+// Hide visually and from screen readers, but maintain layout
+.u-invisible {
+  visibility: hidden;
+}
+
+// Clearfix: contain floats
+.u-clearfix:before,
+.u-clearfix:after {
+  content: " ";
+  display: table;
+}
+
+.u-clearfix:after {
+  clear: both;
+}
+
+.u-right {
+  float: right;
+}
+
+.u-left {
+  float: left;
+}

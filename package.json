@@ -1,0 +1,41 @@
+{
+  "name": "REM",
+  "repository": "https://bitbucket.org/aurer/rem.git",
+  "version": "0.0.1",
+  "description": "A minimal front-end framework",
+  "main": "gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "grunt dev"
+  },
+  "author": "Phil Maurer",
+  "license": "MIT",
+  "dependencies": {
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "babelify": "^7.3.0",
+    "body-parser": "^1.15.2",
+    "browsernizr": "^2.0.1",
+    "express": "^4.14.0",
+    "fuzzysearch": "^1.0.3",
+    "grunt": "^1.0.1",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-less": "^1.4.0",
+    "jsave": "^0.5.7",
+    "less-plugin-autoprefix": "^1.5.1",
+    "object-assign": "^4.1.0",
+    "react": "^15.4.0",
+    "react-dom": "^15.4.0",
+    "react-redux": "^4.4.6",
+    "react-router": "^3.0.0",
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.1.0",
+    "whatwg-fetch": "^2.0.1"
+  },
+  "devDependencies": {
+    "grunt-browser-sync": "^2.1.1",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}

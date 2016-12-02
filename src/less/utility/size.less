@@ -1,0 +1,76 @@
+/*
+ * Sizes
+ */
+// Create a size class
+.size(@x, @y, @prefix: ~'') when (@x < @y){
+  .u@{prefix}-size@{x}of@{y} when not (@x = @y) {
+    @w: (100/@y)*@x;
+    width: ~"@{w}%";
+  }
+}
+
+// Create sizes
+.create-sizes(@columns, @prefix: ~'', @i: 1) when (@i <= @columns) {
+  [class*="u@{prefix}-size"] {
+    flex-basis: auto !important; /* 1 */
+  }
+
+  .size(1,2, @prefix);
+  .size(1,3, @prefix);
+  .size(1,4, @prefix);
+  .size(1,5, @prefix);
+  .size(1,6, @prefix);
+  .size(1,7, @prefix);
+  .size(1,8, @prefix);
+  .size(2,3, @prefix);
+  .size(2,4, @prefix);
+  .size(2,5, @prefix);
+  .size(2,6, @prefix);
+  .size(2,7, @prefix);
+  .size(2,8, @prefix);
+  .size(3,4, @prefix);
+  .size(3,5, @prefix);
+  .size(3,6, @prefix);
+  .size(3,7, @prefix);
+  .size(3,8, @prefix);
+  .size(4,5, @prefix);
+  .size(4,6, @prefix);
+  .size(4,7, @prefix);
+  .size(4,8, @prefix);
+  .size(5,6, @prefix);
+  .size(5,7, @prefix);
+  .size(5,8, @prefix);
+  .size(6,7, @prefix);
+  .size(6,8, @prefix);
+  .size(7,8, @prefix);
+}
+
+// Columns
+.create-sizes(@grid-columns);
+
+@media @mq-sm {
+  .create-sizes(@grid-columns, -sm);
+}
+
+@media @mq-md {
+  .create-sizes(@grid-columns, -md);
+}
+
+@media @mq-lg {
+  .create-sizes(@grid-columns, -lg);
+}
+
+@media @mq-xl {
+  .create-sizes(@grid-columns, -xl);
+}
+
+// =======================
+// Intrinsic sizes
+// =======================
+
+// Make an element the width of its parent.
+.u-sizeFull {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+}

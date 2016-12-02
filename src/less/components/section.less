@@ -1,0 +1,54 @@
+.Section {
+  clear: both;
+
+  &-inner, &-header {
+    padding: @space-sm;
+    max-width: @mq-xl-width;
+    margin: 0 auto;
+
+    &:before,
+	  &:after {
+	    display: table;
+	    content: '';
+	    clear: both;
+	  }
+  }
+
+  &--tall &-inner {
+    padding-top: @space-lg;
+    padding-bottom: @space-lg;
+  }
+
+  &--fullwidth &-inner {
+  	padding-left: 0;
+  	padding-right: 0;
+  }
+
+  &--nopad &-inner {
+  	padding: 0;
+  }
+}
+
+.Section--initialPage {
+  max-width: 30em;
+  min-width: 20em;
+  margin: auto;
+  text-align: center;
+  margin-top: 10%;
+  background-color: fade(#000, 10%);
+  border-radius: 5px;
+  padding: 1em;
+}
+
+.Section--header {
+  h1 {
+    display: none;
+  }
+}
+
+.Section--visibleCurrencies {
+  .Section-inner {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

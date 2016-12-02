@@ -1,0 +1,96 @@
+// Textbox style inputs
+.Form {
+	fieldset {
+		border: none;
+		padding: 0;
+	}
+
+	legend {
+		font-weight: bold;
+		font-style: italic;
+		margin: 0 0 @space
+	}
+
+	button,
+	input[type=submit],
+	input[type=reset],
+	input[type=button] {
+		&:extend(.Button);
+		height: 2em;
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+}
+
+.Form-field {
+	margin-top: @space-sm;
+
+	&:first-of-type {
+		margin-top: 0;
+	}
+
+	label {
+		display: inline-block;
+  	max-width: 100%;
+  	margin-bottom: @space-xs;
+	}
+
+	> label {
+		font-weight: bold;
+	}
+}
+
+.Form--inline {
+	.Form-field {
+		@media @mq-md {
+			display: inline-block;
+			margin-right: @space-sm;
+		}
+	}
+}
+
+// Text inputs
+.Form-inputs {
+	input[type='text'],
+	input[type='search'],
+	input[type='tel'],
+	input[type='url'],
+	input[type='email'],
+	input[type='password'],
+	input[type='date'],
+	input[type='time'],
+	input[type='number'] ,
+	textarea {
+		box-sizing: border-box;
+		display: block;
+	  width: 100%;
+	  min-height: 2rem;
+	  padding: 5px 10px;
+	  border: 1px solid @color-neutral-light;
+	  transition: border-color .2s, box-shadow .2s;
+
+	  &:focus {
+	  	border-color: @color-primary;
+	  	box-shadow: 0 1px 3px fade(@color-primary, 25%);
+			outline: 0;
+	  }
+	}
+
+	// Radios
+	input[type='checkbox'],
+	input[type='radio'] {
+		margin-right: @space-xs;
+		vertical-align: middle;
+		outline: none;
+	}
+}
+
+input.isActive {
+	outline: none;
+	border-color: red;
+}
+
+
+.Form--filter {
+	margin-bottom: 1em;
+}

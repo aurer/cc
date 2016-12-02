@@ -1,0 +1,100 @@
+/* Grid
+   ========================================================================== */
+.Grid {
+  display: block;
+  box-sizing: border-box;
+  margin: 0 0 20px;
+  padding: 0;
+  text-align: left;
+  font-size: 0;
+
+  // Help with clearing
+  &:before,
+  &:after {
+    display: table;
+    content: '';
+    clear: both;
+  }
+
+  // Space items horizontally and vertically
+  &--spaced {
+    margin: 0 -@grid-space/2;
+
+    > .Grid-cell {
+      padding: 0 @grid-space/2 @grid-space;
+    }
+  }
+
+  // Space items horizontally only
+  &--spacedHorizontally {
+    margin: 0 -@grid-space/2;
+
+    > .Grid-cell {
+      padding: 0 @grid-space/2;
+    }
+  }
+
+  // Space items vertically only
+  &--spacedVertically {
+    > .Grid-cell {
+      padding-bottom: @grid-space;
+    }
+  }
+
+  // Modifier: center align all grid cells
+  &--alignCenter {
+    text-align: center;
+  }
+
+  // Modifier: right align all grid cells
+  &--alignRight {
+    text-align: right;
+  }
+
+  // Modifier: middle-align grid cells
+  &--alignMiddle {
+    vertical-align: middle;
+
+    > .Grid-cell {
+      vertical-align: middle;
+    }
+  }
+
+  // Modifier: bottom-align grid cells
+  &--alignBottom {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  // Modifier: allow cells to equal distribute width
+  // 1. Provide all values to avoid IE10 bug with shorthand flex - http://git.io/vllC7
+  // Use `0%` to avoid bug in IE10/11 with unitless flex basis - http://git.io/vllWx
+  &--fit {
+    display: flex;
+
+    > .Grid-cell {
+      flex: 1 1 0%; //1
+    }
+  }
+
+  // Modifier: all cells match height of tallest cell in a row
+  &--equalHeight {
+    display: flex;
+
+    > .Grid-cell {
+      display: flex;
+    }
+  }
+}
+
+.Grid-cell {
+  display: inline-block;
+  box-sizing: inherit;
+  font-size: @base-font-size;
+  vertical-align: top;
+  width: 100%;
+}
+
+.Grid-cell--center {
+  margin: 0 auto;
+}

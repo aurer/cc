@@ -1,0 +1,25 @@
+.Button {
+	display: inline-block;
+	box-sizing: border-box;
+  padding: .8em 1.5em;
+	text-decoration: none;
+	text-align: center;
+	line-height: 1.1;
+	margin: 0 .2em;
+	border: none;
+	background-color: @color-secondary;
+	box-shadow: 0 1px 6px @color-secondary;
+	color: @color-neutral-lightest;
+	font-size: .7em;
+	border-radius: 1.5em;
+	text-transform: uppercase;
+
+	&:visited, {
+		color: @color-neutral-lightest;
+	}
+
+	&:hover, &:focus {
+		background-color: @color-secondary-dark;
+		box-shadow: 0 1px 6px @color-secondary-dark;
+	}
+}
