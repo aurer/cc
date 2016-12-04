@@ -1,0 +1,37 @@
+.LoadingContainer {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: fade(#000, 40%);
+	text-align: center;
+	display: none;
+	justify-content: center;
+	align-items: center;
+
+	.Loading {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 6em;
+		height: 6em;
+		padding: 1em;
+		border-radius: .2em;
+		font-weight: bold;
+		font-size: 1.2em;
+		background-color: @color-secondary;
+		color: @color-primary-dark;
+		box-shadow: 0 5px 50px fade(#000, 50%);
+
+		.Loading-message {
+			position: relative;
+			vertical-align: middle;
+		}
+	}
+
+	&.isActive-true {
+		display: block;
+		display: flex;
+	}
+}

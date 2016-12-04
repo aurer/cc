@@ -15,7 +15,7 @@ import EditCurrencies from './components/EditCurrencies'
 // Configure the store
 const store = createStore(combineReducers(reducers), applyMiddleware(thunkMiddleware))
 let unsubscribe = store.subscribe(() => {
-	// console.log(store.getState());
+	console.log('Current state: ', store.getState());
 });
 store.dispatch(fetchCurrencies());
 

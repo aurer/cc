@@ -22,7 +22,10 @@ class EditCurrencies extends React.Component {
 	}
 
 	render() {
-		var currencies = this.props.currencies.filter(q => fuzzysearch(this.state.filterText, q.symbol.toLowerCase()));
+		var currencies = this.props.currencies.filter(q => {
+			return fuzzysearch(this.state.filterText, q.symbol.toLowerCase()) ||
+				fuzzysearch(this.state.filterText, q.title.toLowerCase())
+		})
 
 		return (
 			<section className="Section Section--EditCurrencies">
@@ -40,7 +43,7 @@ class EditCurrencies extends React.Component {
 
 					{ currencies.map((currency, i) => {
 						return <div className="Currency" key={i}>
-							<span className="Currency-symbol">{currency.symbol}</span>
+							<span className="Currency-symbol">{currency.title}</span>
 							<span className="Currency-toggle">
 								<input id={'toggle'+currency.symbol} type="checkbox" checked={currency.isVisible} onChange={e => this.props.toggleCurrency(currency, e)} />
 								<label htmlFor={'toggle'+currency.symbol}></label>

@@ -30,24 +30,40 @@
 }
 
 .Section--initialPage {
-  max-width: 30em;
-  min-width: 20em;
-  margin: auto;
+  position: absolute;
+  background-color: @color-secondary;
+  color: @color-primary-darker;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   text-align: center;
-  margin-top: 10%;
-  background-color: fade(#000, 10%);
-  border-radius: 5px;
-  padding: 1em;
+  padding-top: 40%;
+
+  h1 {
+    font-size: 8em;
+  }
 }
 
-.Section--header {
+.Section--pageHeader {
+  background-color: @color-secondary;
+  color: @color-primary-dark;
+
   h1 {
-    display: none;
+    font-size: 1.3em;
+    text-align: center;
+    margin: 0;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
   }
 }
 
 .Section--visibleCurrencies {
   .Section-inner {
+    padding-top: 0;
     padding-left: 0;
     padding-right: 0;
   }

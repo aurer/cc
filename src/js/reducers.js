@@ -1,12 +1,13 @@
+import definitions from './definitions';
+
 const round = (float)  => {
 	return Math.round(float * 100) / 100;
 }
 
 export const currencies = (state = {
 	isFetching: false,
-	didInvalidate: false,
-	base: 'USD',
-	timestamp: +new Date,
+	base: '',
+	updated: +new Date,
 	items: []
 }, action) => {
 
@@ -20,6 +21,7 @@ export const currencies = (state = {
 		return values;
 	}
 
+	var newState = {};
 	switch(action.type) {
 		case 'UPDATE_CURRENCIES':
 			let newCurrencies = Object.assign({}, state, action.data);
@@ -31,17 +33,20 @@ export const currencies = (state = {
 			})
 
 		case 'RECIEVE_CURRENCIES':
-			return Object.assign({}, state, {
-				isFetching: false,
-				base: action.data.source,
-				timestamp: action.data.updated,
-				items: Object.values(action.data.quotes).map(entry => ({
-					symbol: entry.symbol,
-					quote: entry.quote,
-					isVisible: entry.isVisible,
-					value: ''
-				}))
+			newState = Object.assign({}, state,
+				action.data, {
+				isFetching: false
 			})
+			localStorage.setItem('state', JSON.stringify(newState));
+			return newState;
+
+		case 'RECIEVE_RAW_CURRENCIES':
+			newState = Object.assign({}, state,
+				transformExchangeJson(action.data, definitions), {
+				isFetching: false
+			})
+			localStorage.setItem('state', JSON.stringify(newState));
+			return newState;
 
 		case 'REQUEST_UPDATE_QUOTES':
 			return Object.assign({}, state, {
@@ -49,23 +54,20 @@ export const currencies = (state = {
 			})
 
 		case 'RECIEVE_UPDATE_QUOTES':
-			return Object.assign({}, state, {
-				isFetching: false,
-				items: Object.values(action.data.quotes).map(entry => ({
-					symbol: entry.symbol,
-					quote: entry.quote,
-					isVisible: entry.isVisible,
-					value: ''
-				}))
+			newState = Object.assign({}, state,
+				transformExchangeJson(action.data, definitions), {
+				isFetching: false
 			})
+			localStorage.setItem('state', JSON.stringify(newState));
+			return newState;
 
 		case 'HANDLE_CHANGE':
 			let activeSymbol = action.data.symbol;
 			let activeValue = action.data.value || '';
-			let activeQuote = Object.values(state.items).find(item => item.symbol == activeSymbol).quote;
+			let activeQuote = state.items.find(item => item.symbol == activeSymbol).quote;
 
-			var newState = Object.assign({}, state, {
-				items: Object.values(state.items).map(entry => {
+			newState = Object.assign({}, state, {
+				items: state.items.map(entry => {
 					var value = entry.symbol == activeSymbol
 						? activeValue
 						: round((activeValue / activeQuote) * entry.quote);
@@ -73,46 +75,57 @@ export const currencies = (state = {
 						value = ''
 					}
 
-					var newEntry = {
-						symbol: entry.symbol,
-						quote: entry.quote,
-						isVisible: entry.isVisible,
+					var newEntry = Object.assign({}, entry, {
 						value: value
-					}
+					});
+
 					return newEntry
 				})
 			})
 
 			return newState;
 
-		case 'REQUEST_TOGGLE_CURRENCY':
-			return Object.assign({}, state, {
-				isFetching: true
-			})
-
-		case 'RECIEVE_TOGGLE_CURRENCY':
-			return Object.assign({}, state, {
-				isFetching: false,
-				items: Object.values(action.data.quotes).map(entry => ({
-					symbol: entry.symbol,
-					quote: entry.quote,
-					isVisible: entry.isVisible,
-					value: ''
-				}))
-			})
-
-
 		case 'TOGGLE_CURRENCY':
-			return Object.assign({}, state, {
-				items: Object.values(state.items).map(entry => ({
-					symbol: entry.symbol,
-					quote: entry.quote,
-					isVisible: (action.data.symbol === entry.symbol) ? true : entry.isVisible,
-					value: entry.value
+			let isChecked = action.event.target.checked;
+			newState = Object.assign({}, state, {
+				items: state.items.map(item => ({
+					title: item.title,
+					symbol: item.symbol,
+					quote: item.quote,
+					value: item.value,
+					isVisible: (action.data.symbol === item.symbol) ? isChecked : item.isVisible,
 				}))
 			});
+			localStorage.setItem('state', JSON.stringify(newState));
+			return newState;
 
 		default:
 			return state || {};
 	}
+}
+
+// Transform the Exchange API JSON into something we can use
+function transformExchangeJson(json, definitions) {
+	var newData = {}
+	var localData = JSON.parse(localStorage.getItem('state'));
+
+	newData.updated = json.timestamp,
+	newData.base = json.source,
+	newData.items = []
+
+	for ( var quote in json.quotes) {
+		var newSymbol = quote.replace(json.source, '');
+		if (localData) {
+			let matchingLocalItem =  localData.items.find(item => item.symbol === newSymbol);
+			var isVisible = matchingLocalItem ? matchingLocalItem.isVisible : false;
+		}
+		newData.items.push({
+			title: definitions[newSymbol],
+			symbol: newSymbol,
+			quote: json.quotes[quote],
+			isVisible: isVisible || false,
+		});
+	}
+
+	return newData;
 }

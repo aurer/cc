@@ -27205,81 +27205,71 @@ module.exports = warning;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+   value: true
 });
-exports.recieveToggleCurrency = exports.requestToggleCurrency = exports.toggleCurrency = exports.recieveUpdateQuotes = exports.requestUpdateQuotes = exports.updateQuotes = exports.fetchCurrencies = exports.handleChange = exports.recieveCurrencies = exports.requestCurrencies = undefined;
+exports.recieveUpdateQuotes = exports.requestUpdateQuotes = exports.updateQuotes = exports.toggleCurrency = exports.recieveRawCurrencies = exports.recieveCurrencies = exports.requestCurrencies = exports.fetchCurrencies = exports.handleChange = undefined;
 
 require('whatwg-fetch');
 
-var requestCurrencies = exports.requestCurrencies = function requestCurrencies() {
-  return { type: 'REQUEST_POSTS' };
-};
-var recieveCurrencies = exports.recieveCurrencies = function recieveCurrencies(currencies) {
-  return { type: 'RECIEVE_CURRENCIES', data: currencies };
-};
-var handleChange = exports.handleChange = function handleChange(data) {
-  return { type: 'HANDLE_CHANGE', data: data };
-};
-
+var exchangeEndpoint = 'http://apilayer.net/api/live?access_key=3ee63dc026b36372bcf91cd099eedca4';
 var urlRoot = window.location.protocol + '//' + window.location.hostname + ':3333';
 
-var fetchCurrencies = exports.fetchCurrencies = function fetchCurrencies() {
-  return function (dispatch) {
-    dispatch(requestCurrencies());
-
-    fetch(urlRoot + '/api/data').then(function (res) {
-      return res.json();
-    }).then(function (json) {
-      return dispatch(recieveCurrencies(json));
-    }).catch(function (e) {
-      console.error(e);
-    });
-  };
+var handleChange = exports.handleChange = function handleChange(data) {
+   return { type: 'HANDLE_CHANGE', data: data };
 };
 
-var updateQuotes = exports.updateQuotes = function updateQuotes() {
-  return function (dispatch) {
-    dispatch(requestUpdateQuotes());
+// Fetch curremcies from the API
+var fetchCurrencies = exports.fetchCurrencies = function fetchCurrencies() {
+   return function (dispatch) {
+      dispatch(requestCurrencies());
+      var localData = JSON.parse(localStorage.getItem('state'));
+      if (localData) {
+         dispatch(recieveCurrencies(localData));
+      } else {
+         fetch(exchangeEndpoint).then(function (res) {
+            return res.json();
+         }).then(function (json) {
+            return dispatch(recieveRawCurrencies(json));
+         }).catch(function (e) {
+            console.error('Error when fetching currencies', e);
+         });
+      }
+   };
+};
+var requestCurrencies = exports.requestCurrencies = function requestCurrencies() {
+   return { type: 'REQUEST_CURRENCIES' };
+};
+var recieveCurrencies = exports.recieveCurrencies = function recieveCurrencies(currencies) {
+   return { type: 'RECIEVE_CURRENCIES', data: currencies };
+};
+var recieveRawCurrencies = exports.recieveRawCurrencies = function recieveRawCurrencies(currencies) {
+   return { type: 'RECIEVE_RAW_CURRENCIES', data: currencies };
+};
 
-    fetch(urlRoot + '/api/data/update-quotes').then(function (res) {
-      return res.json();
-    }).then(function (json) {
-      return dispatch(recieveUpdateQuotes(json));
-    }).catch(function (e) {
-      console.error(e);
-    });
-  };
+// Toggle a currency as active or inactive
+var toggleCurrency = exports.toggleCurrency = function toggleCurrency(json, e) {
+   return { type: 'TOGGLE_CURRENCY', data: json, event: e };
+};
+
+// Update quotes on the server
+var updateQuotes = exports.updateQuotes = function updateQuotes() {
+   return function (dispatch) {
+      dispatch(requestUpdateQuotes());
+
+      fetch(exchangeEndpoint).then(function (res) {
+         return res.json();
+      }).then(function (json) {
+         return dispatch(recieveUpdateQuotes(json));
+      }).catch(function (e) {
+         console.error('Error when fetching update currencies', e);
+      });
+   };
 };
 var requestUpdateQuotes = exports.requestUpdateQuotes = function requestUpdateQuotes() {
-  return { type: 'REQUEST_UPDATE_QUOTES' };
+   return { type: 'REQUEST_UPDATE_QUOTES' };
 };
 var recieveUpdateQuotes = exports.recieveUpdateQuotes = function recieveUpdateQuotes(json) {
-  return { type: 'RECIEVE_UPDATE_QUOTES', data: json };
-};
-
-var toggleCurrency = exports.toggleCurrency = function toggleCurrency(currency, event) {
-  currency.isVisible = event.target.checked;
-  return function (dispatch) {
-    dispatch(requestToggleCurrency());
-
-    fetch(urlRoot + '/api/data/toggle-currency', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(currency)
-    }).then(function (res) {
-      return res.json();
-    }).then(function (json) {
-      return dispatch(recieveToggleCurrency(json));
-    }).catch(function (e) {
-      console.error(e);
-    });
-  };
-};
-var requestToggleCurrency = exports.requestToggleCurrency = function requestToggleCurrency() {
-  return { type: 'REQUEST_TOGGLE_CURRENCY' };
-};
-var recieveToggleCurrency = exports.recieveToggleCurrency = function recieveToggleCurrency(json) {
-  return { type: 'RECIEVE_TOGGLE_CURRENCY', data: json };
+   return { type: 'RECIEVE_UPDATE_QUOTES', data: json };
 };
 
 },{"whatwg-fetch":272}],274:[function(require,module,exports){
@@ -27297,6 +27287,10 @@ var _reactRedux = require('react-redux');
 
 var _reactRouter = require('react-router');
 
+var _Loading = require('./Loading');
+
+var _Loading2 = _interopRequireDefault(_Loading);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var App = _react2.default.createClass({
@@ -27305,9 +27299,10 @@ var App = _react2.default.createClass({
 		return _react2.default.createElement(
 			'div',
 			{ className: 'App' },
+			_react2.default.createElement(_Loading2.default, null),
 			_react2.default.createElement(
 				'section',
-				{ className: 'Section Section--header' },
+				{ className: 'Section Section--pageHeader' },
 				_react2.default.createElement(
 					'div',
 					{ className: 'Section-inner' },
@@ -27317,7 +27312,7 @@ var App = _react2.default.createClass({
 						_react2.default.createElement(
 							_reactRouter.Link,
 							{ to: '/' },
-							'Lucra'
+							'Conversion'
 						)
 					)
 				)
@@ -27329,7 +27324,7 @@ var App = _react2.default.createClass({
 
 exports.default = App;
 
-},{"react":248,"react-redux":176,"react-router":217}],275:[function(require,module,exports){
+},{"./Loading":276,"react":248,"react-redux":176,"react-router":217}],275:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -27379,31 +27374,31 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	};
 };
 
-var AddCurrencies = function (_React$Component) {
-	_inherits(AddCurrencies, _React$Component);
+var EditCurrencies = function (_React$Component) {
+	_inherits(EditCurrencies, _React$Component);
 
-	function AddCurrencies(props) {
-		_classCallCheck(this, AddCurrencies);
+	function EditCurrencies(props) {
+		_classCallCheck(this, EditCurrencies);
 
-		var _this = _possibleConstructorReturn(this, (AddCurrencies.__proto__ || Object.getPrototypeOf(AddCurrencies)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (EditCurrencies.__proto__ || Object.getPrototypeOf(EditCurrencies)).call(this, props));
 
 		_this.state = { filterText: '' };
 		_this.doFilter = _this.doFilter.bind(_this);
 		return _this;
 	}
 
-	_createClass(AddCurrencies, [{
+	_createClass(EditCurrencies, [{
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
 
 			var currencies = this.props.currencies.filter(function (q) {
-				return (0, _fuzzysearch2.default)(_this2.state.filterText, q.symbol.toLowerCase());
+				return (0, _fuzzysearch2.default)(_this2.state.filterText, q.symbol.toLowerCase()) || (0, _fuzzysearch2.default)(_this2.state.filterText, q.title.toLowerCase());
 			});
 
 			return _react2.default.createElement(
 				'section',
-				{ className: 'Section Section--addCurrencies' },
+				{ className: 'Section Section--EditCurrencies' },
 				_react2.default.createElement(
 					'div',
 					{ className: 'Section-header' },
@@ -27436,7 +27431,7 @@ var AddCurrencies = function (_React$Component) {
 							_react2.default.createElement(
 								'span',
 								{ className: 'Currency-symbol' },
-								currency.symbol
+								currency.title
 							),
 							_react2.default.createElement(
 								'span',
@@ -27458,17 +27453,83 @@ var AddCurrencies = function (_React$Component) {
 		}
 	}]);
 
-	return AddCurrencies;
+	return EditCurrencies;
 }(_react2.default.Component);
 
-exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(AddCurrencies);
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(EditCurrencies);
 
-},{"../actions":273,"./TableRow":276,"fuzzysearch":24,"react":248,"react-redux":176,"react-router":217}],276:[function(require,module,exports){
+},{"../actions":273,"./TableRow":277,"fuzzysearch":24,"react":248,"react-redux":176,"react-router":217}],276:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRedux = require('react-redux');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var mapStateToProps = function mapStateToProps(_ref) {
+	var currencies = _ref.currencies;
+	return {
+		currencies: currencies
+	};
+};
+
+var Loading = function (_React$Component) {
+	_inherits(Loading, _React$Component);
+
+	function Loading() {
+		_classCallCheck(this, Loading);
+
+		return _possibleConstructorReturn(this, (Loading.__proto__ || Object.getPrototypeOf(Loading)).apply(this, arguments));
+	}
+
+	_createClass(Loading, [{
+		key: 'render',
+		value: function render() {
+			var containerClassName = 'LoadingContainer isActive-' + this.props.currencies.isFetching;
+			return _react2.default.createElement(
+				'div',
+				{ className: containerClassName },
+				_react2.default.createElement(
+					'div',
+					{ className: 'Loading' },
+					_react2.default.createElement(
+						'p',
+						{ className: 'Loading-message' },
+						'Updating rates'
+					)
+				)
+			);
+		}
+	}]);
+
+	return Loading;
+}(_react2.default.Component);
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(Loading);
+
+},{"react":248,"react-redux":176}],277:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
 
@@ -27480,12 +27541,11 @@ var _actions = require('../actions');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var mapStateToProps = function mapStateToProps(_ref) {
-	var currencies = _ref.currencies;
-	return {
-		currencies: currencies
-	};
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	return {
@@ -27495,35 +27555,75 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	};
 };
 
-var TableRow = _react2.default.createClass({
-	displayName: 'TableRow',
-	render: function render() {
-		var currencies = this.props.currencies;
-		return _react2.default.createElement(
-			'tr',
-			{ className: 'VisibleCurrency' },
-			_react2.default.createElement(
-				'td',
-				{ className: 'VisibleCurrency-field' },
-				_react2.default.createElement('input', { type: 'number', value: this.props.quote.value, ref: this.props.quote.symbol, onChange: this.onChange })
-			),
-			_react2.default.createElement(
-				'th',
-				{ className: 'VisibleCurrency-symbol' },
-				this.props.quote.symbol
-			)
-		);
-	},
-	onChange: function onChange(e) {
-		var symbol = Object.keys(this.refs)[0];
-		var value = e.target.value;
-		this.props.handleChange({ symbol: symbol, value: value });
+var TableRow = function (_React$Component) {
+	_inherits(TableRow, _React$Component);
+
+	function TableRow() {
+		_classCallCheck(this, TableRow);
+
+		return _possibleConstructorReturn(this, (TableRow.__proto__ || Object.getPrototypeOf(TableRow)).apply(this, arguments));
 	}
-});
 
-exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(TableRow);
+	_createClass(TableRow, [{
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			this.state = { isActive: false };
+			this.onFocus = this.onFocus.bind(this);
+			this.onBlur = this.onBlur.bind(this);
+			this.onChange = this.onChange.bind(this);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var rowClassName = 'VisibleCurrency isActive-' + this.state.isActive;
+			return _react2.default.createElement(
+				'tr',
+				{ className: rowClassName },
+				_react2.default.createElement(
+					'th',
+					{ className: 'VisibleCurrency-symbol' },
+					this.props.quote.symbol
+				),
+				_react2.default.createElement(
+					'td',
+					{ className: 'VisibleCurrency-field' },
+					_react2.default.createElement('input', {
+						type: 'number',
+						pattern: '[0-9]*',
+						value: this.props.quote.value,
+						ref: this.props.quote.symbol,
+						onChange: this.onChange,
+						onFocus: this.onFocus,
+						onBlur: this.onBlur
+					})
+				)
+			);
+		}
+	}, {
+		key: 'onFocus',
+		value: function onFocus(e) {
+			this.setState({ isActive: true });
+		}
+	}, {
+		key: 'onBlur',
+		value: function onBlur(e) {
+			this.setState({ isActive: false });
+		}
+	}, {
+		key: 'onChange',
+		value: function onChange(e) {
+			var symbol = Object.keys(this.refs)[0];
+			var value = e.target.value;
+			this.props.handleChange({ symbol: symbol, value: value });
+		}
+	}]);
 
-},{"../actions":273,"react":248,"react-redux":176}],277:[function(require,module,exports){
+	return TableRow;
+}(_react2.default.Component);
+
+exports.default = (0, _reactRedux.connect)(null, mapDispatchToProps)(TableRow);
+
+},{"../actions":273,"react":248,"react-redux":176}],278:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -27552,7 +27652,10 @@ var mapStateToProps = function mapStateToProps(_ref) {
 	var visibleCurrencies = currencies.items.filter(function (c) {
 		return c.isVisible === true;
 	});
-	return { currencies: visibleCurrencies };
+	return {
+		isFetching: currencies.isFetching,
+		currencies: visibleCurrencies
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
@@ -27567,6 +27670,7 @@ var VisibleCurrencies = _react2.default.createClass({
 	displayName: 'VisibleCurrencies',
 	render: function render() {
 		var currencies = this.props.currencies;
+		var loadingClassName = 'Loading ' + 'Loading--' + this.props.isFetching;
 		return _react2.default.createElement(
 			'section',
 			{ className: 'Section Section--visibleCurrencies' },
@@ -27608,7 +27712,185 @@ var VisibleCurrencies = _react2.default.createClass({
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(VisibleCurrencies);
 
-},{"../actions":273,"./TableRow":276,"react":248,"react-redux":176,"react-router":217}],278:[function(require,module,exports){
+},{"../actions":273,"./TableRow":277,"react":248,"react-redux":176,"react-router":217}],279:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+var definitions = {
+	"AED": "United Arab Emirates Dirham",
+	"AFN": "Afghan Afghani",
+	"ALL": "Albanian Lek",
+	"AMD": "Armenian Dram",
+	"ANG": "Netherlands Antillean Guilder",
+	"AOA": "Angolan Kwanza",
+	"ARS": "Argentine Peso",
+	"AUD": "Australian Dollar",
+	"AWG": "Aruban Florin",
+	"AZN": "Azerbaijani Manat",
+	"BAM": "Bosnia-Herzegovina Convertible Mark",
+	"BBD": "Barbadian Dollar",
+	"BDT": "Bangladeshi Taka",
+	"BGN": "Bulgarian Lev",
+	"BHD": "Bahraini Dinar",
+	"BIF": "Burundian Franc",
+	"BMD": "Bermudan Dollar",
+	"BND": "Brunei Dollar",
+	"BOB": "Bolivian Boliviano",
+	"BRL": "Brazilian Real",
+	"BSD": "Bahamian Dollar",
+	"BTC": "Bitcoin",
+	"BTN": "Bhutanese Ngultrum",
+	"BWP": "Botswanan Pula",
+	"BYR": "Belarusian Ruble",
+	"BZD": "Belize Dollar",
+	"CAD": "Canadian Dollar",
+	"CDF": "Congolese Franc",
+	"CHF": "Swiss Franc",
+	"CLF": "Chilean Unit of Account (UF)",
+	"CLP": "Chilean Peso",
+	"CNY": "Chinese Yuan",
+	"COP": "Colombian Peso",
+	"CRC": "Costa Rican Col\xF3n",
+	"CUC": "Cuban Convertible Peso",
+	"CUP": "Cuban Peso",
+	"CVE": "Cape Verdean Escudo",
+	"CZK": "Czech Republic Koruna",
+	"DJF": "Djiboutian Franc",
+	"DKK": "Danish Krone",
+	"DOP": "Dominican Peso",
+	"DZD": "Algerian Dinar",
+	"EEK": "Estonian Kroon",
+	"EGP": "Egyptian Pound",
+	"ERN": "Eritrean Nakfa",
+	"ETB": "Ethiopian Birr",
+	"EUR": "Euro",
+	"FJD": "Fijian Dollar",
+	"FKP": "Falkland Islands Pound",
+	"GBP": "British Pound Sterling",
+	"GEL": "Georgian Lari",
+	"GGP": "Guernsey Pound",
+	"GHS": "Ghanaian Cedi",
+	"GIP": "Gibraltar Pound",
+	"GMD": "Gambian Dalasi",
+	"GNF": "Guinean Franc",
+	"GTQ": "Guatemalan Quetzal",
+	"GYD": "Guyanaese Dollar",
+	"HKD": "Hong Kong Dollar",
+	"HNL": "Honduran Lempira",
+	"HRK": "Croatian Kuna",
+	"HTG": "Haitian Gourde",
+	"HUF": "Hungarian Forint",
+	"IDR": "Indonesian Rupiah",
+	"ILS": "Israeli New Sheqel",
+	"IMP": "Manx pound",
+	"INR": "Indian Rupee",
+	"IQD": "Iraqi Dinar",
+	"IRR": "Iranian Rial",
+	"ISK": "Icelandic Kr\xF3na",
+	"JEP": "Jersey Pound",
+	"JMD": "Jamaican Dollar",
+	"JOD": "Jordanian Dinar",
+	"JPY": "Japanese Yen",
+	"KES": "Kenyan Shilling",
+	"KGS": "Kyrgystani Som",
+	"KHR": "Cambodian Riel",
+	"KMF": "Comorian Franc",
+	"KPW": "North Korean Won",
+	"KRW": "South Korean Won",
+	"KWD": "Kuwaiti Dinar",
+	"KYD": "Cayman Islands Dollar",
+	"KZT": "Kazakhstani Tenge",
+	"LAK": "Laotian Kip",
+	"LBP": "Lebanese Pound",
+	"LKR": "Sri Lankan Rupee",
+	"LRD": "Liberian Dollar",
+	"LSL": "Lesotho Loti",
+	"LTL": "Lithuanian Litas",
+	"LVL": "Latvian Lats",
+	"LYD": "Libyan Dinar",
+	"MAD": "Moroccan Dirham",
+	"MDL": "Moldovan Leu",
+	"MGA": "Malagasy Ariary",
+	"MKD": "Macedonian Denar",
+	"MMK": "Myanma Kyat",
+	"MNT": "Mongolian Tugrik",
+	"MOP": "Macanese Pataca",
+	"MRO": "Mauritanian Ouguiya",
+	"MUR": "Mauritian Rupee",
+	"MVR": "Maldivian Rufiyaa",
+	"MWK": "Malawian Kwacha",
+	"MXN": "Mexican Peso",
+	"MYR": "Malaysian Ringgit",
+	"MZN": "Mozambican Metical",
+	"NAD": "Namibian Dollar",
+	"NGN": "Nigerian Naira",
+	"NIO": "Nicaraguan C\xF3rdoba",
+	"NOK": "Norwegian Krone",
+	"NPR": "Nepalese Rupee",
+	"NZD": "New Zealand Dollar",
+	"OMR": "Omani Rial",
+	"PAB": "Panamanian Balboa",
+	"PEN": "Peruvian Nuevo Sol",
+	"PGK": "Papua New Guinean Kina",
+	"PHP": "Philippine Peso",
+	"PKR": "Pakistani Rupee",
+	"PLN": "Polish Zloty",
+	"PYG": "Paraguayan Guarani",
+	"QAR": "Qatari Rial",
+	"RON": "Romanian Leu",
+	"RSD": "Serbian Dinar",
+	"RUB": "Russian Ruble",
+	"RWF": "Rwandan Franc",
+	"SAR": "Saudi Riyal",
+	"SBD": "Solomon Islands Dollar",
+	"SCR": "Seychellois Rupee",
+	"SDG": "Sudanese Pound",
+	"SEK": "Swedish Krona",
+	"SGD": "Singapore Dollar",
+	"SHP": "Saint Helena Pound",
+	"SLL": "Sierra Leonean Leone",
+	"SOS": "Somali Shilling",
+	"SRD": "Surinamese Dollar",
+	"STD": "S\xE3o Tom\xE9 and Pr\xEDncipe Dobra",
+	"SVC": "Salvadoran Col\xF3n",
+	"SYP": "Syrian Pound",
+	"SZL": "Swazi Lilangeni",
+	"THB": "Thai Baht",
+	"TJS": "Tajikistani Somoni",
+	"TMT": "Turkmenistani Manat",
+	"TND": "Tunisian Dinar",
+	"TOP": "Tongan Pa\u02BBanga",
+	"TRY": "Turkish Lira",
+	"TTD": "Trinidad and Tobago Dollar",
+	"TWD": "New Taiwan Dollar",
+	"TZS": "Tanzanian Shilling",
+	"UAH": "Ukrainian Hryvnia",
+	"UGX": "Ugandan Shilling",
+	"USD": "United States Dollar",
+	"UYU": "Uruguayan Peso",
+	"UZS": "Uzbekistan Som",
+	"VEF": "Venezuelan Bol\xEDvar Fuerte",
+	"VND": "Vietnamese Dong",
+	"VUV": "Vanuatu Vatu",
+	"WST": "Samoan Tala",
+	"XAF": "CFA Franc BEAC",
+	"XAG": "Silver (troy ounce)",
+	"XAU": "Gold (troy ounce)",
+	"XCD": "East Caribbean Dollar",
+	"XDR": "Special Drawing Rights",
+	"XOF": "CFA Franc BCEAO",
+	"XPF": "CFP Franc",
+	"YER": "Yemeni Rial",
+	"ZAR": "South African Rand",
+	"ZMK": "Zambian Kwacha (pre-2013)",
+	"ZMW": "Zambian Kwacha",
+	"ZWL": "Zimbabwean Dollar"
+};
+exports.default = definitions;
+
+},{}],280:[function(require,module,exports){
 'use strict';
 
 var _react = require('react');
@@ -27654,7 +27936,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Configure the store
 var store = (0, _redux.createStore)((0, _redux.combineReducers)(reducers), (0, _redux.applyMiddleware)(_reduxThunk2.default));
 var unsubscribe = store.subscribe(function () {
-	// console.log(store.getState());
+	console.log('Current state: ', store.getState());
 });
 store.dispatch((0, _actions.fetchCurrencies)());
 
@@ -27677,14 +27959,21 @@ _reactDom2.default.render(_react2.default.createElement(
 	)
 ), document.querySelector('main'));
 
-},{"./actions":273,"./components/App":274,"./components/EditCurrencies":275,"./components/VisibleCurrencies":277,"./reducers":279,"react":248,"react-dom":47,"react-redux":176,"react-router":217,"redux":255,"redux-thunk":249}],279:[function(require,module,exports){
+},{"./actions":273,"./components/App":274,"./components/EditCurrencies":275,"./components/VisibleCurrencies":278,"./reducers":281,"react":248,"react-dom":47,"react-redux":176,"react-router":217,"redux":255,"redux-thunk":249}],281:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.currencies = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _definitions = require('./definitions');
+
+var _definitions2 = _interopRequireDefault(_definitions);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var round = function round(float) {
 	return Math.round(float * 100) / 100;
@@ -27693,9 +27982,8 @@ var round = function round(float) {
 var currencies = exports.currencies = function currencies() {
 	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
 		isFetching: false,
-		didInvalidate: false,
-		base: 'USD',
-		timestamp: +new Date(),
+		base: '',
+		updated: +new Date(),
 		items: []
 	};
 	var action = arguments[1];
@@ -27711,7 +27999,7 @@ var currencies = exports.currencies = function currencies() {
 		return values;
 	};
 
-	var newState;
+	var newState = {};
 
 	var _ret = function () {
 		switch (action.type) {
@@ -27729,20 +28017,21 @@ var currencies = exports.currencies = function currencies() {
 				};
 
 			case 'RECIEVE_CURRENCIES':
+				newState = Object.assign({}, state, action.data, {
+					isFetching: false
+				});
+				localStorage.setItem('state', JSON.stringify(newState));
 				return {
-					v: Object.assign({}, state, {
-						isFetching: false,
-						base: action.data.source,
-						timestamp: action.data.updated,
-						items: Object.values(action.data.quotes).map(function (entry) {
-							return {
-								symbol: entry.symbol,
-								quote: entry.quote,
-								isVisible: entry.isVisible,
-								value: ''
-							};
-						})
-					})
+					v: newState
+				};
+
+			case 'RECIEVE_RAW_CURRENCIES':
+				newState = Object.assign({}, state, transformExchangeJson(action.data, _definitions2.default), {
+					isFetching: false
+				});
+				localStorage.setItem('state', JSON.stringify(newState));
+				return {
+					v: newState
 				};
 
 			case 'REQUEST_UPDATE_QUOTES':
@@ -27753,83 +28042,56 @@ var currencies = exports.currencies = function currencies() {
 				};
 
 			case 'RECIEVE_UPDATE_QUOTES':
+				newState = Object.assign({}, state, transformExchangeJson(action.data, _definitions2.default), {
+					isFetching: false
+				});
+				localStorage.setItem('state', JSON.stringify(newState));
 				return {
-					v: Object.assign({}, state, {
-						isFetching: false,
-						items: Object.values(action.data.quotes).map(function (entry) {
-							return {
-								symbol: entry.symbol,
-								quote: entry.quote,
-								isVisible: entry.isVisible,
-								value: ''
-							};
-						})
-					})
+					v: newState
 				};
 
 			case 'HANDLE_CHANGE':
 				var activeSymbol = action.data.symbol;
 				var activeValue = action.data.value || '';
-				var activeQuote = Object.values(state.items).find(function (item) {
+				var activeQuote = state.items.find(function (item) {
 					return item.symbol == activeSymbol;
 				}).quote;
 
 				newState = Object.assign({}, state, {
-					items: Object.values(state.items).map(function (entry) {
+					items: state.items.map(function (entry) {
 						var value = entry.symbol == activeSymbol ? activeValue : round(activeValue / activeQuote * entry.quote);
 						if (value == 0) {
 							value = '';
 						}
 
-						var newEntry = {
-							symbol: entry.symbol,
-							quote: entry.quote,
-							isVisible: entry.isVisible,
+						var newEntry = Object.assign({}, entry, {
 							value: value
-						};
+						});
+
 						return newEntry;
 					})
 				});
-
 
 				return {
 					v: newState
 				};
 
-			case 'REQUEST_TOGGLE_CURRENCY':
-				return {
-					v: Object.assign({}, state, {
-						isFetching: true
-					})
-				};
-
-			case 'RECIEVE_TOGGLE_CURRENCY':
-				return {
-					v: Object.assign({}, state, {
-						isFetching: false,
-						items: Object.values(action.data.quotes).map(function (entry) {
-							return {
-								symbol: entry.symbol,
-								quote: entry.quote,
-								isVisible: entry.isVisible,
-								value: ''
-							};
-						})
-					})
-				};
-
 			case 'TOGGLE_CURRENCY':
-				return {
-					v: Object.assign({}, state, {
-						items: Object.values(state.items).map(function (entry) {
-							return {
-								symbol: entry.symbol,
-								quote: entry.quote,
-								isVisible: action.data.symbol === entry.symbol ? true : entry.isVisible,
-								value: entry.value
-							};
-						})
+				var isChecked = action.event.target.checked;
+				newState = Object.assign({}, state, {
+					items: state.items.map(function (item) {
+						return {
+							title: item.title,
+							symbol: item.symbol,
+							quote: item.quote,
+							value: item.value,
+							isVisible: action.data.symbol === item.symbol ? isChecked : item.isVisible
+						};
 					})
+				});
+				localStorage.setItem('state', JSON.stringify(newState));
+				return {
+					v: newState
 				};
 
 			default:
@@ -27842,4 +28104,30 @@ var currencies = exports.currencies = function currencies() {
 	if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 };
 
-},{}]},{},[278]);
+// Transform the Exchange API JSON into something we can use
+function transformExchangeJson(json, definitions) {
+	var newData = {};
+	var localData = JSON.parse(localStorage.getItem('state'));
+
+	newData.updated = json.timestamp, newData.base = json.source, newData.items = [];
+
+	for (var quote in json.quotes) {
+		var newSymbol = quote.replace(json.source, '');
+		if (localData) {
+			var matchingLocalItem = localData.items.find(function (item) {
+				return item.symbol === newSymbol;
+			});
+			var isVisible = matchingLocalItem ? matchingLocalItem.isVisible : false;
+		}
+		newData.items.push({
+			title: definitions[newSymbol],
+			symbol: newSymbol,
+			quote: json.quotes[quote],
+			isVisible: isVisible || false
+		});
+	}
+
+	return newData;
+}
+
+},{"./definitions":279}]},{},[280]);

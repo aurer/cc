@@ -6,7 +6,10 @@ import TableRow from './TableRow'
 
 let mapStateToProps = ({currencies}) => {
 	let visibleCurrencies = currencies.items.filter(c => c.isVisible === true);
-	return {currencies: visibleCurrencies}
+	return {
+		isFetching: currencies.isFetching,
+		currencies: visibleCurrencies
+	}
 }
 
 let mapDispatchToProps = dispatch => ({
@@ -16,6 +19,7 @@ let mapDispatchToProps = dispatch => ({
 const VisibleCurrencies = React.createClass ({
 	render() {
 		let currencies = this.props.currencies;
+		let loadingClassName = 'Loading ' + 'Loading--' + this.props.isFetching;
 		return (
 			<section className="Section Section--visibleCurrencies">
 				<div className="Section-header">
