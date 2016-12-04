@@ -27671,6 +27671,25 @@ var VisibleCurrencies = _react2.default.createClass({
 	render: function render() {
 		var currencies = this.props.currencies;
 		var loadingClassName = 'Loading ' + 'Loading--' + this.props.isFetching;
+		var fallback = _react2.default.createElement(
+			'div',
+			{ className: 'noCurrenciesMessage' },
+			_react2.default.createElement(
+				'p',
+				null,
+				'You havent added any currencies yet'
+			),
+			_react2.default.createElement(
+				'p',
+				null,
+				_react2.default.createElement(
+					_reactRouter.Link,
+					{ className: 'Button', to: 'edit' },
+					'Add some now'
+				)
+			)
+		);
+
 		return _react2.default.createElement(
 			'section',
 			{ className: 'Section Section--visibleCurrencies' },
@@ -27701,7 +27720,8 @@ var VisibleCurrencies = _react2.default.createClass({
 							return _react2.default.createElement(_TableRow2.default, { key: i, quote: quote });
 						})
 					)
-				)
+				),
+				!currencies.length && fallback
 			)
 		);
 	},

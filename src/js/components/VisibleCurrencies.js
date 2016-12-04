@@ -20,6 +20,11 @@ const VisibleCurrencies = React.createClass ({
 	render() {
 		let currencies = this.props.currencies;
 		let loadingClassName = 'Loading ' + 'Loading--' + this.props.isFetching;
+		let fallback = (<div className="noCurrenciesMessage">
+				<p>You havent added any currencies yet</p>
+				<p><Link className="Button" to="edit">Add some now</Link></p>
+			</div>);
+
 		return (
 			<section className="Section Section--visibleCurrencies">
 				<div className="Section-header">
@@ -32,6 +37,7 @@ const VisibleCurrencies = React.createClass ({
 							{ currencies.map((quote, i) => <TableRow key={i} quote={quote} />) }
 						</tbody>
 					</table>
+					{ !currencies.length && fallback }
 				</div>
 			</section>
 		)
