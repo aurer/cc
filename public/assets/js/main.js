@@ -27211,7 +27211,7 @@ exports.recieveUpdateQuotes = exports.requestUpdateQuotes = exports.updateQuotes
 
 require('whatwg-fetch');
 
-var exchangeEndpoint = 'http://apilayer.net/api/live?access_key=3ee63dc026b36372bcf91cd099eedca4';
+var exchangeEndpoint = 'https://apilayer.net/api/live?access_key=3ee63dc026b36372bcf91cd099eedca4';
 var urlRoot = window.location.protocol + '//' + window.location.hostname + ':3333';
 
 var handleChange = exports.handleChange = function handleChange(data) {
