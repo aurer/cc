@@ -1,6 +1,6 @@
 import 'whatwg-fetch';
 
-const exchangeEndpoint = 'http://apilayer.net/api/live?access_key=3ee63dc026b36372bcf91cd099eedca4';
+const exchangeEndpoint = 'https://apilayer.net/api/live?access_key=3ee63dc026b36372bcf91cd099eedca4';
 const urlRoot = window.location.protocol + '//' + window.location.hostname + ':3333';
 
 export const handleChange = (data) => ({type: 'HANDLE_CHANGE', data });
